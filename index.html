@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horario de Eventos - Enfermería 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+      .tab-active {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      .tab-inactive {
+        background-color: white;
+        color: #4b5563;
+        border-color: #d1d5db;
+      }
+      .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Encabezado -->
+      <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          Programa del Evento
+        </h1>
+        <p class="text-gray-500">21 y 22 de Mayo, 2026</p>
+      </header>
+
+      <!-- Controles de Días (Tabs) -->
+      <div class="flex justify-center space-x-4 mb-8">
+        <button
+          id="btn-jueves"
+          onclick="showDay('jueves')"
+          class="px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active">
+          Jueves 21
+        </button>
+        <button
+          id="btn-viernes"
+          onclick="showDay('viernes')"
+          class="px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive">
+          Viernes 22
+        </button>
+      </div>
+
+      <!-- Contenedor del Horario -->
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div id="schedule-container" class="divide-y divide-gray-100">
+          <!-- Los eventos se inyectarán aquí vía JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Datos del evento extraídos de tu hoja de cálculo
+      const data = {
+        jueves: [
+          {
+            time: "07:30 – 08:00",
+            title: "Registro de asistencia",
+            speaker: "",
+            type: "logistics",
+          },
+          {
+            time: "08:00 – 09:00",
+            title:
+              "Parto humanizado frente a la violencia obstétrica: desafíos para la atención materna en los servicios de salud.",
+            speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+            type: "conference",
+          },
+          {
+            time: "09:00 – 10:10",
+            title:
+              "Tiempo Juntos por Nuestra Salud: Un ensayo clínico que promueve la actividad física, la salud cognitiva, la salud del corazón y el sueño en personas mayores hispanas/latinas.",
+            speaker: "G. Adriana Perez, PhD.",
+            type: "conference",
+          },
+          {
+            time: "10:10 – 10:35",
+            title: "Inauguración.",
+            speaker: "",
+            type: "special",
+          },
+          {
+            time: "10:35 – 11:35",
+            title:
+              "Concurso carteles científicos e infografías y Coffee break.",
+            speaker: "",
+            type: "break",
+          },
+          {
+            time: "11:35 – 13:00",
+            title: "El ejercicio autónomo de enfermería.",
+            speaker: "Dra. Anahí Ruiz Lara.",
+            type: "conference",
+          },
+          {
+            time: "13:00 – 14:30",
+            title: "COMIDA",
+            speaker: "",
+            type: "break",
+          },
+          {
+            time: "14:30 – 15:00",
+            title: "Registro de asistencia",
+            speaker: "",
+            type: "logistics",
+          },
+          {
+            time: "15:00 – 16:00",
+            title:
+              "Vigilancia nutricional infantil: un pilar transversal en el fortalecimiento de los sistemas de salud.",
+            speaker: "Dra. Elizabeth Hoyos Loya.",
+            type: "conference",
+          },
+          {
+            time: "16:00 – 17:00",
+            title:
+              "TB farmacorresistente y micobacteriosis en Oaxaca: Lo que la epidemiología molecular aporta al cuidado del paciente.",
+            speaker: "Dra. Yuko Nakamura López.",
+            type: "conference",
+          },
+          {
+            time: "17:00 – 18:00",
+            title: "Evento cultural.",
+            speaker: "",
+            type: "special",
+          },
+        ],
+        viernes: [
+          {
+            time: "07:30 – 08:00",
+            title: "Registro de asistencia",
+            speaker: "",
+            type: "logistics",
+          },
+          {
+            time: "08:00 – 09:00",
+            title:
+              "Parto humanizado frente a la violencia obstétrica: desafíos para la atención materna en los servicios de salud.",
+            speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+            type: "conference",
+          },
+          {
+            time: "09:00 – 10:10",
+            title:
+              "Tiempo Juntos por Nuestra Salud: Un ensayo clínico que promueve la actividad física, la salud cognitiva, la salud del corazón y el sueño en personas mayores hispanas/latinas.",
+            speaker: "G. Adriana Perez, PhD.",
+            type: "conference",
+          },
+          {
+            time: "10:10 – 10:35",
+            title: "Experiencias en servicio social y elaboración de tesis",
+            speaker: "Egresada Daniela Salazar Martínez.",
+            type: "conference",
+          },
+          {
+            time: "10:35 – 11:35",
+            title:
+              "Concurso carteles científicos e infografías y Coffee break.",
+            speaker: "",
+            type: "break",
+          },
+          {
+            time: "11:35 – 12:35",
+            title: "El ejercicio autónomo de enfermería.",
+            speaker: "Dra. Anahí Ruiz Lara.",
+            type: "conference",
+          },
+          {
+            time: "12:35 – 13:00",
+            title: "Premiación de carteles científicos e infografías.",
+            speaker: "",
+            type: "special",
+          },
+          {
+            time: "13:00 – 14:30",
+            title: "COMIDA",
+            speaker: "",
+            type: "break",
+          },
+          {
+            time: "14:30 – 15:00",
+            title: "Registro de asistencia",
+            speaker: "",
+            type: "logistics",
+          },
+          {
+            time: "15:00 – 16:00",
+            title:
+              "Vigilancia nutricional infantil: un pilar transversal en el fortalecimiento de los sistemas de salud.",
+            speaker: "Dra. Elizabeth Hoyos Loya.",
+            type: "conference",
+          },
+          {
+            time: "16:00 – 17:00",
+            title:
+              "TB farmacorresistente y micobacteriosis en Oaxaca: Lo que la epidemiología molecular aporta al cuidado del paciente.",
+            speaker: "Dra. Yuko Nakamura López.",
+            type: "conference",
+          },
+          {
+            time: "17:00 – 18:00",
+            title: "Evento cultural.",
+            speaker: "",
+            type: "special",
+          },
+        ],
+      };
+
+      function getBadgeColor(type) {
+        switch (type) {
+          case "conference":
+            return "bg-blue-100 text-blue-800";
+          case "break":
+            return "bg-orange-100 text-orange-800";
+          case "logistics":
+            return "bg-gray-100 text-gray-600";
+          case "special":
+            return "bg-purple-100 text-purple-800";
+          default:
+            return "bg-gray-100 text-gray-800";
+        }
+      }
+
+      function renderSchedule(day) {
+        const container = document.getElementById("schedule-container");
+        container.innerHTML = ""; // Limpiar eventos anteriores
+
+        data[day].forEach((event) => {
+          const eventHTML = `
+                    <div class="p-4 md:p-6 flex flex-col md:flex-row hover:bg-gray-50 transition-colors duration-150 fade-in">
+                        <div class="md:w-1/4 mb-2 md:mb-0 text-sm font-semibold text-gray-500 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            ${event.time}
+                        </div>
+                        <div class="md:w-3/4 md:pl-6 border-l-2 md:border-l-4 border-transparent md:border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">${event.title}</h3>
+                            ${event.speaker ? `<p class="text-blue-600 text-sm font-medium mt-1 mb-2">👤 ${event.speaker}</p>` : ""}
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(event.type)} mt-1">
+                                ${event.type === "conference" ? "Conferencia" : event.type === "break" ? "Receso / Comida" : event.type === "special" ? "Especial" : "Logística"}
+                            </span>
+                        </div>
+                    </div>
+                `;
+          container.innerHTML += eventHTML;
+        });
+      }
+
+      function showDay(day) {
+        // Actualizar botones
+        const btnJueves = document.getElementById("btn-jueves");
+        const btnViernes = document.getElementById("btn-viernes");
+
+        if (day === "jueves") {
+          btnJueves.className =
+            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active";
+          btnViernes.className =
+            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive";
+        } else {
+          btnViernes.className =
+            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active";
+          btnJueves.className =
+            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive";
+        }
+
+        // Renderizar datos correspondientes
+        renderSchedule(day);
+      }
+
+      // Cargar el jueves por defecto al iniciar
+      showDay("jueves");
+    </script>
+  </body>
+</html>
