@@ -10,19 +10,27 @@
         font-family: "Inter", sans-serif;
         background-color: #f3f4f6;
       }
-      .tab-active {
-        background-color: #2563eb;
+
+      /* Estilos para Categorías (Nivel 1) */
+      .cat-active {
+        background-color: #1e40af;
         color: white;
-        border-color: #2563eb;
       }
-      .tab-inactive {
-        background-color: white;
-        color: #4b5563;
-        border-color: #d1d5db;
+      .cat-inactive {
+        background-color: #e5e7eb;
+        color: #374151;
       }
-      .tab-inactive:hover {
-        background-color: #f9fafb;
+
+      /* Estilos para Días (Nivel 2) */
+      .day-active {
+        border-bottom: 3px solid #2563eb;
+        color: #2563eb;
+        font-weight: 700;
       }
+      .day-inactive {
+        color: #6b7280;
+      }
+
       .fade-in {
         animation: fadeIn 0.3s ease-in-out;
       }
@@ -38,262 +46,713 @@
       }
     </style>
   </head>
-  <body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-      <header class="text-center mb-8 flex flex-col items-center">
+  <body class="p-4 md:p-8 flex flex-col min-h-screen">
+    <div class="max-w-5xl mx-auto flex-grow w-full">
+      <header class="text-center mb-6 flex flex-col items-center">
         <img
           src="logo.png"
-          alt="Logotipo 9a Jornada Académica y 4a Internacional - UMAR"
+          alt="Logotipo Jornadas"
           class="w-full max-w-xl h-auto mb-4" />
-
         <div class="space-y-1">
-          <p class="text-gray-600 text-lg md:text-xl font-medium">
-            Jueves 21 y Viernes 22 de Mayo, 2026
-          </p>
-          <p class="text-gray-500 text-sm mt-1">Huatulco, Oaxaca</p>
+          <p class="text-gray-600 text-lg font-medium">Huatulco, Oaxaca</p>
         </div>
       </header>
 
-      <div class="flex justify-center space-x-4 mb-8">
+      <div
+        class="flex rounded-xl overflow-hidden shadow-sm mb-6 max-w-md mx-auto">
         <button
-          id="btn-jueves"
-          onclick="showDay('jueves')"
-          class="px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active">
+          id="cat-conferencias"
+          onclick="setCategory('conferencias')"
+          class="flex-1 py-3 px-4 text-center font-bold transition-colors cat-active">
+          CONFERENCIAS
+        </button>
+        <button
+          id="cat-talleres"
+          onclick="setCategory('talleres')"
+          class="flex-1 py-3 px-4 text-center font-bold transition-colors cat-inactive">
+          TALLERES
+        </button>
+      </div>
+
+      <div class="flex justify-center space-x-8 mb-6 border-b border-gray-200">
+        <button
+          id="day-jueves"
+          onclick="setDay('jueves')"
+          class="pb-3 px-4 text-sm uppercase tracking-wider day-active">
           Jueves 21
         </button>
         <button
-          id="btn-viernes"
-          onclick="showDay('viernes')"
-          class="px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive">
+          id="day-viernes"
+          onclick="setDay('viernes')"
+          class="pb-3 px-4 text-sm uppercase tracking-wider day-inactive">
           Viernes 22
         </button>
       </div>
 
       <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
         <div id="schedule-container" class="divide-y divide-gray-100"></div>
       </div>
     </div>
 
+    <footer
+      class="max-w-4xl mx-auto w-full mt-auto pt-8 pb-6 border-t border-gray-200 flex flex-col items-center">
+      <img
+        src="umar.png"
+        alt="Logotipo UMAR"
+        class="h-28 md:h-32 w-auto mb-4 opacity-90" />
+      <p
+        class="text-center text-gray-500 text-xs uppercase tracking-widest font-semibold">
+        Universidad del Mar • Campus Huatulco
+      </p>
+    </footer>
+
     <script>
-      // Datos del evento extraídos de tu hoja de cálculo
+      // Estado de la aplicación
+      let activeCategory = "conferencias";
+      let activeDay = "jueves";
+
       const data = {
-        jueves: [
-          {
-            time: "07:30 – 08:00",
-            title: "Registro de asistencia",
-            speaker: "",
-            type: "logistics",
-          },
-          {
-            time: "08:00 – 09:00",
-            title:
-              "Parto humanizado frente a la violencia obstétrica: desafíos para la atención materna en los servicios de salud.",
-            speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
-            type: "conference",
-          },
-          {
-            time: "09:00 – 10:10",
-            title:
-              "Tiempo Juntos por Nuestra Salud: Un ensayo clínico que promueve la actividad física, la salud cognitiva, la salud del corazón y el sueño en personas mayores hispanas/latinas.",
-            speaker: "G. Adriana Perez, PhD.",
-            type: "conference",
-          },
-          {
-            time: "10:10 – 10:35",
-            title: "Inauguración.",
-            speaker: "",
-            type: "special",
-          },
-          {
-            time: "10:35 – 11:35",
-            title:
-              "Concurso carteles científicos e infografías y Coffee break.",
-            speaker: "",
-            type: "break",
-          },
-          {
-            time: "11:35 – 13:00",
-            title: "El ejercicio autónomo de enfermería.",
-            speaker: "Dra. Anahí Ruiz Lara.",
-            type: "conference",
-          },
-          {
-            time: "13:00 – 14:30",
-            title: "COMIDA",
-            speaker: "",
-            type: "break",
-          },
-          {
-            time: "14:30 – 15:00",
-            title: "Registro de asistencia",
-            speaker: "",
-            type: "logistics",
-          },
-          {
-            time: "15:00 – 16:00",
-            title:
-              "Vigilancia nutricional infantil: un pilar transversal en el fortalecimiento de los sistemas de salud.",
-            speaker: "Dra. Elizabeth Hoyos Loya.",
-            type: "conference",
-          },
-          {
-            time: "16:00 – 17:00",
-            title:
-              "TB farmacorresistente y micobacteriosis en Oaxaca: Lo que la epidemiología molecular aporta al cuidado del paciente.",
-            speaker: "Dra. Yuko Nakamura López.",
-            type: "conference",
-          },
-          {
-            time: "17:00 – 18:00",
-            title: "Evento cultural.",
-            speaker: "",
-            type: "special",
-          },
-        ],
-        viernes: [
-          {
-            time: "07:30 – 08:00",
-            title: "Registro de asistencia",
-            speaker: "",
-            type: "logistics",
-          },
-          {
-            time: "08:00 – 09:00",
-            title:
-              "Parto humanizado frente a la violencia obstétrica: desafíos para la atención materna en los servicios de salud.",
-            speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
-            type: "conference",
-          },
-          {
-            time: "09:00 – 10:10",
-            title:
-              "Tiempo Juntos por Nuestra Salud: Un ensayo clínico que promueve la actividad física, la salud cognitiva, la salud del corazón y el sueño en personas mayores hispanas/latinas.",
-            speaker: "G. Adriana Perez, PhD.",
-            type: "conference",
-          },
-          {
-            time: "10:10 – 10:35",
-            title: "Experiencias en servicio social y elaboración de tesis",
-            speaker: "Egresada Daniela Salazar Martínez.",
-            type: "conference",
-          },
-          {
-            time: "10:35 – 11:35",
-            title:
-              "Concurso carteles científicos e infografías y Coffee break.",
-            speaker: "",
-            type: "break",
-          },
-          {
-            time: "11:35 – 12:35",
-            title: "El ejercicio autónomo de enfermería.",
-            speaker: "Dra. Anahí Ruiz Lara.",
-            type: "conference",
-          },
-          {
-            time: "12:35 – 13:00",
-            title: "Premiación de carteles científicos e infografías.",
-            speaker: "",
-            type: "special",
-          },
-          {
-            time: "13:00 – 14:30",
-            title: "COMIDA",
-            speaker: "",
-            type: "break",
-          },
-          {
-            time: "14:30 – 15:00",
-            title: "Registro de asistencia",
-            speaker: "",
-            type: "logistics",
-          },
-          {
-            time: "15:00 – 16:00",
-            title:
-              "Vigilancia nutricional infantil: un pilar transversal en el fortalecimiento de los sistemas de salud.",
-            speaker: "Dra. Elizabeth Hoyos Loya.",
-            type: "conference",
-          },
-          {
-            time: "16:00 – 17:00",
-            title:
-              "TB farmacorresistente y micobacteriosis en Oaxaca: Lo que la epidemiología molecular aporta al cuidado del paciente.",
-            speaker: "Dra. Yuko Nakamura López.",
-            type: "conference",
-          },
-          {
-            time: "17:00 – 18:00",
-            title: "Evento cultural.",
-            speaker: "",
-            type: "special",
-          },
-        ],
+        conferencias: {
+          jueves: [
+            {
+              time: "07:30 – 08:00",
+              title: "Registro de asistencia",
+              speaker: "",
+              type: "logistics",
+            },
+            {
+              time: "08:00 – 09:00",
+              title: "Parto humanizado frente a la violencia obstétrica.",
+              speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+              type: "conference",
+            },
+            {
+              time: "09:00 – 10:10",
+              title: "Tiempo Juntos por Nuestra Salud: Ensayo clínico.",
+              speaker: "G. Adriana Perez, PhD.",
+              type: "conference",
+            },
+            {
+              time: "10:10 – 10:35",
+              title: "Inauguración.",
+              speaker: "",
+              type: "special",
+            },
+            {
+              time: "10:35 – 11:35",
+              title: "Concurso carteles y Coffee break.",
+              speaker: "",
+              type: "break",
+            },
+            {
+              time: "11:35 – 13:00",
+              title: "El ejercicio autónomo de enfermería.",
+              speaker: "Dra. Anahí Ruiz Lara.",
+              type: "conference",
+            },
+            {
+              time: "13:00 – 14:30",
+              title: "COMIDA",
+              speaker: "",
+              type: "break",
+            },
+            {
+              time: "15:00 – 16:00",
+              title: "Vigilancia nutricional infantil.",
+              speaker: "Dra. Elizabeth Hoyos Loya.",
+              type: "conference",
+            },
+            {
+              time: "16:00 – 17:00",
+              title: "TB farmacorresistente y micobacteriosis.",
+              speaker: "Dra. Yuko Nakamura López.",
+              type: "conference",
+            },
+            {
+              time: "17:00 – 18:00",
+              title: "Evento cultural.",
+              speaker: "",
+              type: "special",
+            },
+          ],
+          viernes: [
+            {
+              time: "07:30 – 08:00",
+              title: "Registro de asistencia",
+              speaker: "",
+              type: "logistics",
+            },
+            {
+              time: "08:00 – 09:00",
+              title: "Parto humanizado frente a la violencia obstétrica.",
+              speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+              type: "conference",
+            },
+            {
+              time: "10:10 – 10:35",
+              title: "Experiencias en servicio social y tesis.",
+              speaker: "Daniela Salazar Martínez.",
+              type: "conference",
+            },
+            {
+              time: "11:35 – 12:35",
+              title: "El ejercicio autónomo de enfermería.",
+              speaker: "Dra. Anahí Ruiz Lara.",
+              type: "conference",
+            },
+            {
+              time: "12:35 – 13:00",
+              title: "Premiación de carteles e infografías.",
+              speaker: "",
+              type: "special",
+            },
+            {
+              time: "13:00 – 14:30",
+              title: "COMIDA",
+              speaker: "",
+              type: "break",
+            },
+            {
+              time: "15:00 – 16:00",
+              title: "Vigilancia nutricional infantil.",
+              speaker: "Dra. Elizabeth Hoyos Loya.",
+              type: "conference",
+            },
+            {
+              time: "17:00 – 18:00",
+              title: "Evento cultural.",
+              speaker: "",
+              type: "special",
+            },
+          ],
+        },
+        talleres: {
+          jueves: [
+            // Turno Matutino
+            {
+              time: "08:00 - 09:00",
+              title: "Registro",
+              speaker: "",
+              location: "",
+              type: "logistics",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Marcaje y manejo integral de persona con estomas.",
+              speaker: "E.E.H.E. Nancy Manuel Aparicio.",
+              location: "Clínica Robotizada Sala de Mezclas",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de la enfermera circulante en el pre, trans y posoperatorio.",
+              speaker: "E.E.QX. Guadalupe García Cortes.",
+              location: "Clínica Robotizada Quirófano I y Recuperación",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en el control prenatal y la atención al trabajo de parto y la persona recién nacida.",
+              speaker: "E.E.M.P. Alejandro Sánchez de la Rosa.",
+              location: "Clínica Robotizada Expulsión I",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en la fluidoterapia, administración y preparación de aminas y uso del desfibrilador.",
+              speaker: "E.E.C.I. José Antonio Pacheco Peralta.",
+              location: "Clínica Robotizada UCI",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en el manejo del paciente pediátrico en incubadora y cuna térmica, Manejo del paciente con fototerapia.",
+              speaker: "E.E.P. Gabriela Eugenia Hernández García.",
+              location: "Clínica Robotizada UCIN",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Fármacos de uso hospitalario y Preparación y administración de fármacos intravenosos.",
+              speaker: "L.E. Alexis Miguel Carreón Vásquez.",
+              location: "Clínica Robotizada Hospitalización",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Demostración de terapias extracorpóreas.",
+              speaker: "Mtro. Esteban Fernando Martínez Santaella.",
+              location: "Clínica Robotizada Sala de Anatomía",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Esquema de vacunación y lineamientos vigentes 2026: preparación y administración de vacunas.",
+              speaker: "L.E. Magnolia Jiménez Quiroz.",
+              location: "Clínica Robotizada Red de Frio",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Principios básicos del Proceso de Atención de Enfermería.",
+              speaker: "Dr. Raúl Fernando Guerrero Castañeda.",
+              location: "Aula 28",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Propósitos que sanan ¿Por qué elegí ser enfermero (a)?.",
+              speaker: "Dra. Anabel Contreras Martínez.",
+              location: "Sala Audiovisual",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Toma de muestras sanguíneas e identificación de tubos de muestra.",
+              speaker: "QB. Sol Madrid Castro.",
+              location: "Laboratorio de Química",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Quemaduras de primer y segundo grado, curación de heridas y técnicas de vendaje.",
+              speaker: "L.E. Ali Maximiliano Sánchez Reyes.",
+              location: "Clínica Robotizada Quirófano II",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "De la política a la práctica: estrategias de orientación alimentaria en los primeros 1000 días de vida.",
+              speaker: "Dra. Elizabeth Hoyos Loya.",
+              location: "Sala de Biblioteca",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Las manos y su papel en la prevención de las IAAS.",
+              speaker: "Dra. Yuko Nakamura López.",
+              location: "Laboratorio de Biología",
+              type: "workshop",
+            },
+
+            // Turno Vespertino
+            {
+              time: "14:30 - 15:00",
+              title: "Registro",
+              speaker: "",
+              location: "",
+              type: "logistics",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de la enfermera instrumentista en el transoperatorio.",
+              speaker: "E.E.QX. Guadalupe García Cortes.",
+              location: "Clínica Robotizada Quirófano I",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en urgencias y emergencias obstétricas.",
+              speaker: "E.E.M.P. Alejandro Sánchez de la Rosa.",
+              location: "Clínica Robotizada Expulsión I",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Rol de enfermería en el Triage obstétrico, Código Mater y ERIO.",
+              speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+              location: "Clínica Robotizada Expulsión II",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en la interpretación de gasometrías.",
+              speaker: "E.E.C.I. José Antonio Pacheco Peralta.",
+              location: "Clínica Robotizada UCI",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en Oxigenoterapia y manejo de la CPAP.",
+              speaker: "L.E. Vicenta Guzmán Ortiz.",
+              location: "Clínica Robotizada UCIN",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Instalación, mantenimiento y cuidados de enfermería en el Catéter Venoso Periférico Corto y cuidados del Catéter Venoso Central.",
+              speaker: "L.E. Alexis Miguel Carreón Vásquez.",
+              location: "Clínica Robotizada Hospitalización",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title: "Demostración de terapias extracorpóreas.",
+              speaker: "Mtro. Esteban Fernando Martínez Santaella.",
+              location: "Clínica Robotizada Sala de Anatomía",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Obtención, manejo y conservación de la muestra para tamiz metabólico neonatal.",
+              speaker: "L.E. Herlinda López García.",
+              location: "Clínica Robotizada Red de Frio",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Aplicación del Proceso de Atención de Enfermería en el adulto mayor.",
+              speaker: "Dr. Raúl Fernando Guerrero Castañeda.",
+              location: "Clínica Robotizada Labor de Parto",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Fundamentos de la Investigación en Enfermería: De la Curiosidad al Impacto Clínico.",
+              speaker: "G. Adriana Perez, PhD.",
+              location: "Sala Audiovisual",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title: "Manejo de diferentes muestras biológicas.",
+              speaker: "QB. Sol Madrid Castro.",
+              location: "Laboratorio de Química",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Cuidados de enfermería en el recién nacido con alimentación por sonda.",
+              speaker: "E.E.P. Gabriela Eugenia Hernández García.",
+              location: "Clínica Robotizada Sala de Mezclas",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Enfermería que emprende: del cuidado al ejercicio profesional independiente.",
+              speaker: "Dra. Anahí Ruiz Lara.",
+              location: "Sala de Biblioteca",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Desarrollo de competencias digitales para el aprendizaje y la gestión de la evidencia en enfermería.",
+              speaker: "Dr. Francisco Javier Arroyo Cruz.",
+              location: "Sala de cómputo A",
+              type: "workshop",
+            },
+          ],
+          viernes: [
+            // Turno Matutino
+            {
+              time: "08:00 - 09:00",
+              title: "Registro",
+              speaker: "",
+              location: "",
+              type: "logistics",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Marcaje y manejo integral de persona con estomas.",
+              speaker: "E.E.H.E. Nancy Manuel Aparicio.",
+              location: "Clínica Robotizada Sala de Mezclas",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de la enfermera circulante en el pre, trans y posoperatorio.",
+              speaker: "E.E.QX. Guadalupe García Cortes.",
+              location: "Clínica Robotizada Quirófano I Y Recuperación",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en el control prenatal y la atención al trabajo de parto y la persona recién nacida.",
+              speaker: "E.E.M.P. Alejandro Sánchez de la Rosa.",
+              location: "Clínica Robotizada Expulsión I",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en la fluidoterapia, administración y preparación de aminas y uso del desfibrilador.",
+              speaker: "E.E.C.I. José Antonio Pacheco Peralta.",
+              location: "Clínica Robotizada UCI",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Intervenciones de enfermería en el manejo del paciente pediátrico en incubadora y cuna térmica, Manejo del paciente con fototerapia.",
+              speaker: "E.E.P. Gabriela Eugenia Hernández García.",
+              location: "Clínica Robotizada UCIN",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Fármacos de uso hospitalario y Preparación y administración de fármacos intravenosos (técnica sas, dilución, aforación).",
+              speaker: "L.E. Alexis Miguel Carreón Vásquez.",
+              location: "Clínica Robotizada Hospitalización",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Demostración de terapias extracorpóreas.",
+              speaker: "Mtro. Esteban Fernando Martínez Santaella.",
+              location: "Clínica Robotizada Sala de Anatomía",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Esquema de vacunación y lineamientos vigentes 2026: preparación y administración de vacunas por vía intramuscular, subcutánea e intradérmica.",
+              speaker: "L.E. Magnolia Jiménez Quiroz.",
+              location: "Clínica Robotizada Red de Frio",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Principios básicos del Proceso de Atención de Enfermería.",
+              speaker: "Dr. Raúl Fernando Guerrero Castañeda.",
+              location: "Aula 28",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Propósitos que sanan ¿Por qué elegí ser enfermero (a)?.",
+              speaker: "Dra. Anabel Contreras Martínez.",
+              location: "Sala Audiovisual",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Toma de muestras sanguíneas e identificación de tubos de muestra.",
+              speaker: "QB. Sol Madrid Castro.",
+              location: "Laboratorio de Química",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title:
+                "Quemaduras de primer y segundo grado, curación de heridas y técnicas de vendaje.",
+              speaker: "L.E. Ali Maximiliano Sánchez Reyes.",
+              location: "Clínica Robotizada Quirófano II",
+              type: "workshop",
+            },
+            {
+              time: "09:00 - 13:00",
+              title: "Las manos y su papel en la prevención de las IAAS.",
+              speaker: "Dra. Yuko Nakamura López.",
+              location: "Laboratorio de Biología",
+              type: "workshop",
+            },
+
+            // Turno Vespertino
+            {
+              time: "14:30 - 15:00",
+              title: "Registro",
+              speaker: "",
+              location: "",
+              type: "logistics",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de la enfermera instrumentista en el transoperatorio.",
+              speaker: "E.E.QX. Guadalupe García Cortes.",
+              location: "Clínica Robotizada Quirófano I",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en urgencias y emergencias obstétricas (redacción de hojas de referencias).",
+              speaker: "E.E.M.P. Alejandro Sánchez de la Rosa.",
+              location: "Clínica Robotizada Expulsión I",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Rol de enfermería en el Triage obstétrico, Código Mater y ERIO.",
+              speaker: "E.E.O.P. Lizzeth Cruz Bernal.",
+              location: "Clínica Robotizada Expulsión II",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en la interpretación de gasometrías.",
+              speaker: "E.E.C.I. José Antonio Pacheco Peralta.",
+              location: "Clínica Robotizada UCI",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Intervenciones de enfermería en Oxigenoterapia y manejo de la CPAP (presión positiva continua en la vía respiratoria).",
+              speaker: "L.E. Vicenta Guzmán Ortiz.",
+              location: "Clínica Robotizada UCIN",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Instalación, mantenimiento y cuidados de enfermería en el Catéter Venoso Periférico Corto y cuidados del Catéter Venoso Central.",
+              speaker: "L.E. Alexis Miguel Carreón Vásquez.",
+              location: "Clínica Robotizada Hospitalización",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title: "Demostración de terapias extracorpóreas.",
+              speaker: "Mtro. Esteban Fernando Martínez Santaella.",
+              location: "Clínica Robotizada Sala de Anatomía",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Obtención, manejo y conservación de la muestra para tamiz metabólico neonatal.",
+              speaker: "L.E. Herlinda López García.",
+              location: "Clínica Robotizada Red de Frio",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Aplicación del Proceso de Atención de Enfermería en el adulto mayor.",
+              speaker: "Dr. Raúl Fernando Guerrero Castañeda.",
+              location: "Clínica Robotizada Labor de Parto",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Fundamentos de la Investigación en Enfermería: De la Curiosidad al Impacto Clínico",
+              speaker: "G. Adriana Perez, PhD.",
+              location: "Sala Audiovisual",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title: "Manejo de diferentes muestras biológicas.",
+              speaker: "QB. Sol Madrid Castro.",
+              location: "Laboratorio de Química",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Cuidados de enfermería en el recién nacido con alimentación por sonda.",
+              speaker: "E.E.P. Gabriela Eugenia Hernández García.",
+              location: "Clínica Robotizada Sala de Mezclas",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Enfermería que emprende: del cuidado al ejercicio profesional independiente.",
+              speaker: "Dra. Anahí Ruiz Lara.",
+              location: "Sala de Biblioteca",
+              type: "workshop",
+            },
+            {
+              time: "15:00 - 18:00",
+              title:
+                "Desarrollo de competencias digitales para el aprendizaje y la gestión de la evidencia en enfermería.",
+              speaker: "Dr. Francisco Javier Arroyo Cruz.",
+              location: "Sala de cómputo A",
+              type: "workshop",
+            },
+          ],
+        },
       };
 
-      function getBadgeColor(type) {
-        switch (type) {
-          case "conference":
-            return "bg-blue-100 text-blue-800";
-          case "break":
-            return "bg-orange-100 text-orange-800";
-          case "logistics":
-            return "bg-gray-100 text-gray-600";
-          case "special":
-            return "bg-purple-100 text-purple-800";
-          default:
-            return "bg-gray-100 text-gray-800";
-        }
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.getElementById("cat-conferencias").className =
+          `flex-1 py-3 px-4 text-center font-bold transition-colors ${cat === "conferencias" ? "cat-active" : "cat-inactive"}`;
+        document.getElementById("cat-talleres").className =
+          `flex-1 py-3 px-4 text-center font-bold transition-colors ${cat === "talleres" ? "cat-active" : "cat-inactive"}`;
+        render();
       }
 
-      function renderSchedule(day) {
-        const container = document.getElementById("schedule-container");
-        container.innerHTML = ""; // Limpiar eventos anteriores
+      function setDay(day) {
+        activeDay = day;
+        document.getElementById("day-jueves").className =
+          `pb-3 px-4 text-sm uppercase tracking-wider ${day === "jueves" ? "day-active" : "day-inactive"}`;
+        document.getElementById("day-viernes").className =
+          `pb-3 px-4 text-sm uppercase tracking-wider ${day === "viernes" ? "day-active" : "day-inactive"}`;
+        render();
+      }
 
-        data[day].forEach((event) => {
-          const eventHTML = `
-                    <div class="p-4 md:p-6 flex flex-col md:flex-row hover:bg-gray-50 transition-colors duration-150 fade-in">
-                        <div class="md:w-1/4 mb-2 md:mb-0 text-sm font-semibold text-gray-500 flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            ${event.time}
+      function render() {
+        const container = document.getElementById("schedule-container");
+        container.innerHTML = "";
+
+        const currentList = data[activeCategory][activeDay];
+
+        currentList.forEach((event) => {
+          const color =
+            event.type === "conference"
+              ? "bg-blue-100 text-blue-800"
+              : event.type === "workshop"
+                ? "bg-emerald-100 text-emerald-800"
+                : event.type === "break"
+                  ? "bg-orange-100 text-orange-800"
+                  : "bg-gray-100 text-gray-600";
+
+          container.innerHTML += `
+                    <div class="p-4 md:p-6 flex flex-col md:flex-row hover:bg-gray-50 fade-in">
+                        <div class="md:w-1/4 mb-2 md:mb-0 text-sm font-bold text-gray-500 flex items-center">
+                            <span class="bg-gray-200 px-2 py-1 rounded mr-2 text-[10px]">HORA</span> ${event.time}
                         </div>
-                        <div class="md:w-3/4 md:pl-6 border-l-2 md:border-l-4 border-transparent md:border-gray-200">
-                            <h3 class="text-lg font-medium text-gray-900 mb-1">${event.title}</h3>
-                            ${event.speaker ? `<p class="text-blue-600 text-sm font-medium mt-1 mb-2">👤 ${event.speaker}</p>` : ""}
-                            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${getBadgeColor(event.type)} mt-1">
-                                ${event.type === "conference" ? "Conferencia" : event.type === "break" ? "Receso / Comida" : event.type === "special" ? "Especial" : "Logística"}
-                            </span>
+                        <div class="md:w-3/4 md:pl-6 border-l-0 md:border-l border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight">${event.title}</h3>
+                            ${event.speaker ? `<p class="text-blue-700 text-sm font-semibold mt-2">👤 ${event.speaker}</p>` : ""}
+                            ${event.location ? `<p class="text-gray-500 text-sm mt-1">📍 ${event.location}</p>` : ""}
+                            <div class="mt-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${color}">
+                                    ${event.type === "workshop" ? "Taller" : event.type === "conference" ? "Conferencia" : "General"}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 `;
-          container.innerHTML += eventHTML;
         });
       }
 
-      function showDay(day) {
-        // Actualizar botones
-        const btnJueves = document.getElementById("btn-jueves");
-        const btnViernes = document.getElementById("btn-viernes");
-
-        if (day === "jueves") {
-          btnJueves.className =
-            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active";
-          btnViernes.className =
-            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive";
-        } else {
-          btnViernes.className =
-            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-active";
-          btnJueves.className =
-            "px-6 py-2 rounded-full font-medium border transition-colors duration-200 tab-inactive";
-        }
-
-        // Renderizar datos correspondientes
-        renderSchedule(day);
-      }
-
-      // Cargar el jueves por defecto al iniciar
-      showDay("jueves");
+      // Cargar vista inicial
+      render();
     </script>
   </body>
 </html>
